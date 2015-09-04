@@ -1,0 +1,28 @@
+{
+  "name": "map-ast",
+  "version": "0.0.0",
+  "description": "Makes it easy to transform a JavaScript AST",
+  "keywords": ["ast","transform","map","transpile"],
+  "main": "built.js",
+  "dependencies": {
+    "ast-children": "0"
+  },
+  "devDependencies": {
+    "serve": "jkroso/serve",
+    "simple-spy": "1",
+    "hydro-fail-fast": "0",
+    "hydro-html": "*",
+    "hydro-bdd": "*",
+    "hydro-dot": "*",
+    "babel": "5",
+    "hydro": "*",
+    "jsmd": "*"
+  },
+  "scripts": {
+    "prepublish": "babel index.js > built.js"
+  },
+  "repository": "git://github.com/jkroso/map-ast.js.git",
+  "author": "Jake Rosoman",
+  "files": ["built.js", "index.js"],
+  "license": "MIT"
+}

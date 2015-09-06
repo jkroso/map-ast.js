@@ -8,16 +8,30 @@ const children = require('ast-children')
  */
 
 const freshVars = node => {
+  if (node == null) return []
   switch (node.type) {
-    case 'VariableDeclaration':
-      return node.declarations.map(d => d.id.name)
+    case 'VariableDeclarator': return paramVars(node.id)
     case 'FunctionExpression':
     case 'ArrowFunctionExpression': return [] // early exit
     case 'FunctionDeclaration': return [node.id.name]
-    case 'CatchClause': return freshVars(node.body).concat(node.param.name)
+    case 'CatchClause': return freshVars(node.body).concat(paramVars(node.param))
   }
   return children(node).map(freshVars).reduce(concat, [])
 }
+
+const paramVars = node => {
+  if (node.type == 'Identifier') return [node.name]
+  if (node.type == 'AssignmentPattern') return paramVars(node.left)
+  if (node.type == 'RestElement') return paramVars(node.argument)
+  if (node.type == 'Property') {
+    return isPattern(node.value)
+      ? paramVars(node.value)
+      : paramVars(node.key)
+  }
+  return children(node).map(paramVars).reduce(concat, [])
+}
+
+const isPattern = node => node != null && /\w+Pattern$/.test(node.type)
 
 const concat = (a, b) => a.concat(b)
 

@@ -1,11 +1,11 @@
 {
   "name": "map-ast",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Makes it easy to transform a JavaScript AST",
   "keywords": ["ast","transform","map","transpile"],
   "main": "built.js",
   "dependencies": {
-    "ast-children": "0"
+    "ast-children": "1"
   },
   "devDependencies": {
     "serve": "jkroso/serve",
@@ -21,6 +21,7 @@
   "scripts": {
     "prepublish": "babel index.js > built.js"
   },
+  "transpile": [["*.js", "!sourcegraph/babel->js"]],
   "repository": "git://github.com/jkroso/map-ast.js.git",
   "author": "Jake Rosoman",
   "files": ["built.js", "index.js"],

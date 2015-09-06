@@ -1,3 +1,4 @@
+if (typeof window != 'undefined') window.process={argv:[],env:[]} // hack for browser
 const {spy} = require('simple-spy')
 const {parse} = require('babel')
 const assert = require('assert')
@@ -140,3 +141,30 @@ WhileStatement: ['test', 'body']
 check('while(true)a', 'Identifier', 'Literal')
 YieldExpression: ['argument']
 check('(function*(){yield 1})', 'Literal')
+
+describe('scope tracking', () => {
+  const check = (src, type, ...vars) => {
+    const fn = spy(()=>null)
+    const transforms = {[type]: fn}
+    map(transforms, null, parse(src))
+    assert(fn.callCount == 1)
+    const env = fn.args[0][1]
+    assert(Object.keys(env).join() == vars.join())
+  }
+
+  it('simple variables', () => {
+    check('var a,b;[]', 'ArrayExpression', 'a', 'b')
+  })
+
+  it('simple patterns', () => {
+    check('var {a} = 1;[]', 'ArrayExpression', 'a')
+    check('var {a, ...b} = 1;[]', 'ArrayExpression', 'a', 'b')
+    check('var [a] = 1;[]', 'ArrayExpression', 'a')
+    check('var [a, ...b] = 1;[]', 'ArrayExpression', 'a', 'b')
+  })
+
+  it('complex patterns', () => {
+    check('var {a:{b,...c}} = 1;[]', 'ArrayExpression', 'b', 'c')
+    check('var [a, {b:{c}}] = 1;[]', 'ArrayExpression', 'a', 'c')
+  })
+})

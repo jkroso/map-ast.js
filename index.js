@@ -76,23 +76,11 @@ map.FunctionDeclaration =
 map.FunctionExpression = (transforms, old_env, node) => {
   var new_env = Object.create(old_env)
   freshVars(node.body).forEach(name => new_env[name] = undefined)
-  node.params = node.params.map(p => mapParam(p, old_env, new_env, transforms))
+  node.params = node.params.map(p => {
+    paramVars(p).forEach(name => new_env[name] =  undefined)
+    return map(transforms, old_env, p)
+  })
   node.body = map(transforms, new_env, node.body)
-}
-
-const mapParam = (param, old_env, new_env, transforms) => {
-  if (param.type == 'Identifier') {
-    new_env[param.name] = undefined
-    return map(transforms, new_env, param)
-  }
-  if (param.type == 'AssignmentPattern') {
-    param.left = mapParam(param.left, old_env, new_env, transforms)
-    param.right = map(transforms, old_env, param.right)
-  }
-  if (param.type == 'RestElement') {
-    param.argument = mapParam(param.argument, old_env, new_env, transforms)
-  }
-  return param
 }
 
 map.BlockStatement = makeMapper('body')
@@ -162,7 +150,8 @@ map.TryStatement = (transforms, env, node) => {
 
 map.CatchClause = (transforms, env, node) => {
   const new_env = Object.create(env)
-  node.param = mapParam(node.param, env, new_env, transforms)
+  paramVars(node.param).forEach(name => new_env[name] = undefined)
+  node.param = map(transforms, new_env, node.param)
   node.body = map(transforms, new_env, node.body)
 }
 

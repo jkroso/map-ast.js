@@ -167,4 +167,16 @@ describe('scope tracking', () => {
     check('var {a:{b,...c}} = 1;[]', 'ArrayExpression', 'b', 'c')
     check('var [a, {b:{c}}] = 1;[]', 'ArrayExpression', 'a', 'c')
   })
+
+  it('simple function parameters', () => {
+    check('(a)=>[]', 'ArrayExpression', 'a')
+    check('(a,b)=>[]', 'ArrayExpression', 'a', 'b')
+    check('(a,b,...c)=>[]', 'ArrayExpression', 'a', 'b', 'c')
+    check('(a,b,...c)=>[];1', 'Literal')
+  })
+
+  it('complex function parameters', () => {
+    check('({a:{b,...c}})=>[]', 'ArrayExpression', 'b', 'c')
+    check('([a, {b,...c}])=>[]', 'ArrayExpression', 'a', 'b', 'c')
+  })
 })

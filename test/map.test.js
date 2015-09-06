@@ -14,16 +14,8 @@ const count = (value, array) => {
 
 const check = (src, ...types) => {
   const transforms = {}
-  types.forEach(type => {
-    transforms[type] = spy(()=>null)
-  })
-  try {
-    var ast = parse(src)
-  } catch (e) {
-    e.stack = src + ' ' + e.stack
-    throw e
-  }
-  map(transforms, null, ast)
+  types.forEach(type => transforms[type] = spy(()=>null))
+  map(transforms, null, parse(src))
   types.forEach(type => {
     var fn = transforms[type]
     var ok = fn.callCount == count(type, types)

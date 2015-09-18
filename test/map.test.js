@@ -171,4 +171,8 @@ describe('scope tracking', () => {
     check('({a:{b,...c}})=>[]', 'ArrayExpression', 'b', 'c')
     check('([a, {b,...c}])=>[]', 'ArrayExpression', 'a', 'b', 'c')
   })
+
+  it('ClassDeclaration\'s', () => {
+    check('class A {};[]', 'ArrayExpression', 'A')
+  })
 })

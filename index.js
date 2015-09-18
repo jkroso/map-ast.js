@@ -13,6 +13,7 @@ const freshVars = node => {
     case 'VariableDeclarator': return paramVars(node.id)
     case 'FunctionExpression':
     case 'ArrowFunctionExpression': return [] // early exit
+    case 'ClassDeclaration':
     case 'FunctionDeclaration': return [node.id.name]
     case 'CatchClause': return freshVars(node.body).concat(paramVars(node.param))
   }

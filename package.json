@@ -1,6 +1,6 @@
 {
   "name": "map-ast",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Makes it easy to transform a JavaScript AST",
   "keywords": ["ast","transform","map","transpile"],
   "main": "built.js",
@@ -15,13 +15,12 @@
     "hydro-bdd": "*",
     "hydro-dot": "*",
     "babel": "5",
-    "hydro": "*",
-    "jsmd": "*"
+    "hydro": "*"
   },
   "scripts": {
     "prepublish": "babel index.js > built.js"
   },
-  "transpile": [["*.js", "!sourcegraph/babel->js"]],
+  "transpile": [["{index,test/*}.js", "!sourcegraph/babel->js"]],
   "repository": "git://github.com/jkroso/map-ast.js.git",
   "author": "Jake Rosoman",
   "files": ["built.js", "index.js"],

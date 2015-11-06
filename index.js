@@ -24,7 +24,7 @@ const paramVars = node => {
   if (node.type == 'Identifier') return [node.name]
   if (node.type == 'AssignmentPattern') return paramVars(node.left)
   if (node.type == 'RestElement') return paramVars(node.argument)
-  if (node.type == 'Property') {
+  if (node.type == 'ObjectProperty') {
     return isPattern(node.value)
       ? paramVars(node.value)
       : paramVars(node.key)
@@ -54,6 +54,10 @@ const map = (transforms, env, node) => {
   const fn = map[node.type]
   if (fn) fn(transforms, env, node)
   return node
+}
+
+map.File = (transforms, env, node) => {
+  node.program = map(transforms, env, node.program)
 }
 
 map.VariableDeclarator = (transforms, env, node) => {
@@ -86,7 +90,7 @@ map.FunctionExpression = (transforms, old_env, node) => {
 
 map.BlockStatement = makeMapper('body')
 
-map.Property = (transforms, env, node) => {
+map.ObjectProperty = (transforms, env, node) => {
   node.key = map(transforms, env, node.key)
   node.value = map(transforms, env, node.value)
 }
@@ -99,8 +103,14 @@ map.ClassExpression = (transforms, env, node) => {
 }
 
 map.ClassBody = map.BlockStatement
-map.ClassProperty = map.Property
-map.MethodDefinition = map.Property
+map.ClassProperty = map.ObjectProperty
+map.MethodDefinition = map.ObjectProperty
+
+map.ClassMethod = (transforms, env, node) => {
+  node.key = map(transforms, env, node.key)
+  map.FunctionExpression(transforms, env, node)
+}
+map.ObjectMethod = map.ClassMethod
 
 map.ContinueStatement = (transforms, env, node) => {
   node.label = map(transforms, env, node.label)

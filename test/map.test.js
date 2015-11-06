@@ -1,8 +1,8 @@
 if (typeof window != 'undefined') window.process={argv:[],env:[]} // hack for browser
-const {spy} = require('simple-spy')
-const {parse} = require('babel')
-const assert = require('assert')
-const map = require('../index')
+import {parse as babylon} from 'babylon'
+import {spy} from 'simple-spy'
+import assert from 'assert'
+import map from '../index'
 
 const count = (value, array) => {
   var count = 0
@@ -11,6 +11,25 @@ const count = (value, array) => {
   }
   return count
 }
+
+const parse = src =>
+  babylon(src, {
+    sourceType: 'module',
+    plugins: [
+     'jsx',
+     'flow',
+     'asyncFunctions',
+     'classConstructorCall',
+     'doExpressions',
+     'trailingFunctionCommas',
+     'objectRestSpread',
+     'decorators',
+     'classProperties',
+     'exportExtensions',
+     'exponentiationOperator',
+     'asyncGenerators'
+    ]
+  })
 
 const check = (src, ...types) => {
   const transforms = {}
@@ -25,39 +44,39 @@ const check = (src, ...types) => {
 }
 
 AssignmentExpression: ['left', 'right']
-check('a=1', 'Literal')
+check('a=1', 'NumericLiteral')
 AssignmentPattern: ['left', 'right']
 check('[a={}]=1', 'ObjectExpression', 'Identifier')
 ArrayExpression: ['elements']
 check('[a]', 'Identifier')
 ArrayPattern: ['elements']
-check('var [a=1]=[{}]', 'Literal', 'ObjectExpression')
+check('var [a=1]=[{}]', 'NumericLiteral', 'ObjectExpression')
 ArrowFunctionExpression: ['params', 'body']
-check('(a=1)=>({})', 'Literal', 'ObjectExpression')
+check('(a=1)=>({})', 'NumericLiteral', 'ObjectExpression')
 BlockStatement: ['body']
 check('{a}', 'Identifier')
 BinaryExpression: ['left', 'right']
-check('a < 1', 'Identifier', 'Literal')
+check('a < 1', 'Identifier', 'NumericLiteral')
 BreakStatement: ['label']
 check('while(true)break', 'BreakStatement')
 CallExpression: ['callee', 'arguments']
-check('a(1)', 'Identifier', 'Literal')
+check('a(1)', 'Identifier', 'NumericLiteral')
 CatchClause: ['param', 'body']
 check('try{}catch(e){[]}', 'Identifier', 'ArrayExpression')
 ClassDeclaration: ['id', 'superClass', 'body']
 ClassExpression: ['id', 'superClass', 'body']
-check('class A extends 1 {}', 'Identifier', 'Literal', 'ClassBody')
+check('class A extends 1 {}', 'Identifier', 'NumericLiteral', 'ClassBody')
 ClassBody: ['body']
-check('class a {b(){1}}', 'Literal')
+check('class a {b(){1}}', 'NumericLiteral')
 ConditionalExpression: ['test', 'consequent', 'alternate']
-check('true?[]:{}', 'Literal', 'ArrayExpression', 'ObjectExpression')
+check('true?[]:{}', 'BooleanLiteral', 'ArrayExpression', 'ObjectExpression')
 ContinueStatement: ['label']
 check('while(true)continue', 'ContinueStatement')
 check('a:while(true)continue a', 'Identifier', 'Identifier')
 DebuggerStatement: []
 check('debugger', 'DebuggerStatement')
 DoWhileStatement: ['body', 'test']
-check('do {1} while([])', 'Literal', 'ArrayExpression')
+check('do {1} while([])', 'NumericLiteral', 'ArrayExpression')
 EmptyStatement: []
 ExportAllDeclaration: ['source']
 ExportDefaultDeclaration: ['declaration']
@@ -80,59 +99,59 @@ check('(function a(b={}){[]})', 'ArrayExpression', 'ObjectExpression')
 Identifier: []
 check('a', 'Identifier')
 IfStatement: ['test', 'consequent', 'alternate']
-check('if (true) {[]} else {({})}', 'Literal', 'ArrayExpression', 'ObjectExpression')
+check('if (true) {[]} else {({})}', 'BooleanLiteral', 'ArrayExpression', 'ObjectExpression')
 Literal: []
-check('1', 'Literal')
+check('1', 'NumericLiteral')
 LabeledStatement: ['label', 'body']
-check('a:{1}', 'Literal')
+check('a:{1}', 'NumericLiteral')
 LogicalExpression: ['left', 'right']
-check('a&&1', 'Literal', 'Identifier')
-MemberExpression: ['object', 'property']
+check('a&&1', 'NumericLiteral', 'Identifier')
+MemberExpression: ['object', 'ObjectProperty']
 check('({}).b', 'Identifier', 'ObjectExpression')
 MethodDefinition: ['key', 'value']
-check('({b(){1}})', 'Identifier', 'Literal')
+check('({b(){1}})', 'Identifier', 'NumericLiteral')
 NewExpression: ['callee', 'arguments']
-check('new a(1)', 'Identifier', 'Literal')
+check('new a(1)', 'Identifier', 'NumericLiteral')
 ObjectExpression: ['properties']
-check('({a:1})', 'Property')
+check('({a:1})', 'ObjectProperty')
 ObjectPattern: ['properties']
-check('({a}=1)', 'Property')
-Property: ['key', 'value']
-check('({a:1})', 'Literal', 'Identifier')
+check('({a}=1)', 'ObjectProperty')
+ObjectProperty: ['key', 'value']
+check('({a:1})', 'NumericLiteral', 'Identifier')
 RestElement: [ 'argument' ]
 check('(...a)=>1', 'Identifier')
 ReturnStatement: ['argument']
-check('()=>{return 1}', 'Literal')
+check('()=>{return 1}', 'NumericLiteral')
 SequenceExpression: ['expressions']
-check('a,1', 'Literal', 'Identifier')
+check('a,1', 'NumericLiteral', 'Identifier')
 SpreadElement: ['argument']
 check('[...a]', 'Identifier')
 Super: []
 check('class A {constructor(){super()}}', 'Super')
 SwitchStatement: ['discriminant', 'cases'],
-check('switch (true) {case {}: []}', 'SwitchCase', 'Literal')
+check('switch (true) {case {}: []}', 'SwitchCase', 'BooleanLiteral')
 SwitchCase: ['test', 'consequent'],
 check('switch (true) {case {}: []}', 'ObjectExpression', 'ArrayExpression')
 TemplateLiteral: ['quasis', 'expressions']
-check('`a${1}`', 'Literal')
+check('`a${1}`', 'NumericLiteral')
 ThisExpression: []
 check('(function(){this})', 'ThisExpression')
 ThrowStatement: ['argument']
-check('throw 1', 'Literal')
+check('throw 1', 'NumericLiteral')
 TryStatement: ['block', 'handler', 'finalizer'],
-check('try{a}finally{1}', 'Identifier', 'Literal')
-check('try{}catch(e){1}', 'Identifier', 'Literal')
+check('try{a}finally{1}', 'Identifier', 'NumericLiteral')
+check('try{}catch(e){1}', 'Identifier', 'NumericLiteral')
 UnaryExpression: ['argument']
 check('~a', 'Identifier')
 UpdateExpression: ['argument']
 check('a++', 'Identifier')
 VariableDeclaration: ['declarations']
 VariableDeclarator: ['id', 'init']
-check('var a = 1', 'Identifier', 'Literal')
+check('var a = 1', 'Identifier', 'NumericLiteral')
 WhileStatement: ['test', 'body']
-check('while(true)a', 'Identifier', 'Literal')
+check('while(true)a', 'Identifier', 'BooleanLiteral')
 YieldExpression: ['argument']
-check('(function*(){yield 1})', 'Literal')
+check('(function*(){yield 1})', 'NumericLiteral')
 
 describe('scope tracking', () => {
   const check = (src, type, ...vars) => {
@@ -164,7 +183,7 @@ describe('scope tracking', () => {
     check('(a)=>[]', 'ArrayExpression', 'a')
     check('(a,b)=>[]', 'ArrayExpression', 'a', 'b')
     check('(a,b,...c)=>[]', 'ArrayExpression', 'a', 'b', 'c')
-    check('(a,b,...c)=>[];1', 'Literal')
+    check('(a,b,...c)=>[];1', 'NumericLiteral')
   })
 
   it('complex function parameters', () => {

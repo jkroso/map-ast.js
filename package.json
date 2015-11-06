@@ -1,6 +1,6 @@
 {
   "name": "map-ast",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Makes it easy to transform a JavaScript AST",
   "keywords": ["ast","transform","map","transpile"],
   "main": "built.js",
@@ -14,6 +14,8 @@
     "hydro-html": "*",
     "hydro-bdd": "*",
     "hydro-dot": "*",
+    "babel-core": "6",
+    "babylon": "6",
     "babel": "5",
     "hydro": "*"
   },

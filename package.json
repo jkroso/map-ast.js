@@ -1,6 +1,6 @@
 {
   "name": "map-ast",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Makes it easy to transform a JavaScript AST",
   "keywords": ["ast","transform","map","transpile"],
   "main": "built.js",

@@ -194,4 +194,14 @@ describe('scope tracking', () => {
   it('ClassDeclaration\'s', () => {
     check('class A {};[]', 'ArrayExpression', 'A')
   })
+
+  it('import default', () => {
+    check('import a from "a";[]', 'ArrayExpression', 'a')
+  })
+
+  it('import', () => {
+    check('import {a} from "a";[]', 'ArrayExpression', 'a')
+    check('import {a,b} from "a";[]', 'ArrayExpression', 'a', 'b')
+    check('import {a as b} from "a";[]', 'ArrayExpression', 'b')
+  })
 })

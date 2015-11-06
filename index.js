@@ -11,6 +11,8 @@ const freshVars = node => {
   if (node == null) return []
   switch (node.type) {
     case 'VariableDeclarator': return paramVars(node.id)
+    case 'ImportDefaultSpecifier':
+    case 'ImportSpecifier': return [node.local.name]
     case 'FunctionExpression':
     case 'ArrowFunctionExpression': return [] // early exit
     case 'ClassDeclaration':
@@ -75,6 +77,16 @@ map.ObjectPattern =
 map.ObjectExpression = makeMapper('properties')
 map.ArrayPattern =
 map.ArrayExpression = makeMapper('elements')
+map.ImportDeclaration = makeMapper('specifiers')
+
+map.ImportDefaultSpecifier = (transforms, env, node) => {
+  node.local = map(transforms, env, node.local)
+}
+
+map.ImportSpecifier = (transforms, env, node) => {
+  node.imported = map(transforms, env, node.imported)
+  node.local = map(transforms, env, node.local)
+}
 
 map.ArrowFunctionExpression =
 map.FunctionDeclaration =
